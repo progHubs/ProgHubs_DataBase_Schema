@@ -1,3 +1,19 @@
+# ProgHubs
+
+## The Ultimate Developer Collaboration Platform
+
+ProgHubs is a comprehensive platform designed to streamline collaboration among software development teams. It provides tools for project management, team communication, code challenges, and idea sharing - all in one integrated ecosystem.
+
+### Key Features
+- **Team Management**: Create and manage development teams with customizable roles
+- **Project Tracking**: Organize work with projects, tasks, and sprints
+- **Real-time Communication**: Chat channels and direct messaging
+- **Skill Development**: Participate in coding challenges and track progress
+- **Innovation Hub**: Share and vote on project ideas
+- **Seamless Integration**: Connect with popular development tools
+
+Below is the complete API documentation for developers looking to integrate with or extend the ProgHubs platform.
+
 # ProgHubs -- The Complete API Documentation
 
 ## Table of Contents
@@ -422,13 +438,13 @@
 ### Add Team Member
 
 - **POST** `/api/teams/{team_id}/members`
-- **Description**: Add a user to a team
+- **Description**: Add a user to a team with specified role
 - **Authentication**: Required (Team Owner or Co-Leader only)
 - **Request Body**:
   ```json
   {
     "user_id": "uuid",
-    "role": "Member"
+    "role": "Member" // Member, Co-Leader, Owner
   }
   ```
 - **Response**: `201 Created`
@@ -472,8 +488,11 @@
 ### List Team Members
 
 - **GET** `/api/teams/{team_id}/members`
-- **Description**: Get a list of team members
+- **Description**: Get a list of team members with their roles
 - **Authentication**: Required
+- **Query Parameters**:
+  - `role`: Filter by role (Owner, Co-Leader, Member)
+  - `search`: Search by name
 - **Response**: `200 OK`
   ```json
   {
@@ -489,6 +508,310 @@
     ]
   }
   ```
+
+### Team Invitation
+
+### Invite User to Team
+
+- **POST** `/api/teams/{team_id}/invitations`
+- **Description**: Send invitation to a user to join a team
+- **Authentication**: Required (Team Owner or Co-Leader only)
+- **Request Body**:
+  ```json
+  {
+    "email": "user@example.com",
+    "role": "Member",
+    "message": "Hey, join our awesome team!"
+  }
+  ```
+- **Response**: `201 Created`
+  ```json
+  {
+    "id": "uuid",
+    "email": "user@example.com",
+    "role": "Member",
+    "expires_at": "timestamp",
+    "created_at": "timestamp"
+  }
+  ```
+
+### List Team Invitations
+
+- **GET** `/api/teams/{team_id}/invitations`
+- **Description**: Get pending invitations for a team
+- **Authentication**: Required (Team Owner or Co-Leader only)
+- **Response**: `200 OK`
+  ```json
+  {
+    "invitations": [
+      {
+        "id": "uuid",
+        "email": "user@example.com",
+        "role": "Member",
+        "status": "pending",
+        "created_at": "timestamp",
+        "expires_at": "timestamp"
+      },
+      ...
+    ]
+  }
+  ```
+
+### Accept Team Invitation
+
+- **POST** `/api/invitations/{invitation_id}/accept`
+- **Description**: Accept a team invitation
+- **Authentication**: Required
+- **Response**: `200 OK`
+  ```json
+  {
+    "team_id": "uuid",
+    "team_name": "Dream Team",
+    "user_id": "uuid",
+    "role": "Member",
+    "joined_at": "timestamp"
+  }
+  ```
+
+### Reject Team Invitation
+
+- **POST** `/api/invitations/{invitation_id}/reject`
+- **Description**: Reject a team invitation
+- **Authentication**: Required
+- **Response**: `200 OK`
+  ```json
+  {
+    "message": "Invitation rejected successfully"
+  }
+  ```
+
+### Cancel Team Invitation
+
+- **DELETE** `/api/teams/{team_id}/invitations/{invitation_id}`
+- **Description**: Cancel a pending team invitation
+- **Authentication**: Required (Team Owner or Co-Leader only)
+- **Response**: `204 No Content`
+
+### Team Analytics
+
+### Get Team Activity Stats
+
+- **GET** `/api/teams/{team_id}/analytics/activity`
+- **Description**: Get team activity statistics over time
+- **Authentication**: Required (Team Owner or Co-Leader only)
+- **Query Parameters**:
+  - `period`: Time period (day, week, month, year)
+  - `start_date`: Start date for custom period
+  - `end_date`: End date for custom period
+- **Response**: `200 OK`
+  ```json
+  {
+    "period": "month",
+    "data_points": [
+      {
+        "date": "2023-07-01",
+        "tasks_created": 12,
+        "tasks_completed": 8,
+        "comments": 24,
+        "active_members": 5
+      },
+      ...
+    ],
+    "totals": {
+      "tasks_created": 45,
+      "tasks_completed": 32,
+      "comments": 87,
+      "active_members": 6
+    }
+  }
+  ```
+
+### Get Team Member Performance
+
+- **GET** `/api/teams/{team_id}/analytics/members`
+- **Description**: Get performance metrics for team members
+- **Authentication**: Required (Team Owner or Co-Leader only)
+- **Query Parameters**:
+  - `period`: Time period (week, month, quarter, year)
+- **Response**: `200 OK`
+  ```json
+  {
+    "period": "month",
+    "members": [
+      {
+        "user_id": "uuid",
+        "full_name": "Jane Doe",
+        "tasks_assigned": 15,
+        "tasks_completed": 12,
+        "completion_rate": 80,
+        "avg_completion_time": "2.3 days",
+        "comments": 18
+      },
+      ...
+    ]
+  }
+  ```
+
+### Get Team Project Stats
+
+- **GET** `/api/teams/{team_id}/analytics/projects`
+- **Description**: Get statistics for team projects
+- **Authentication**: Required (Team Owner or Co-Leader only)
+- **Response**: `200 OK`
+  ```json
+  {
+    "total_projects": 5,
+    "active_projects": 3,
+    "completed_projects": 1,
+    "on_hold_projects": 1,
+    "projects": [
+      {
+        "id": "uuid",
+        "name": "E-commerce Platform",
+        "status": "Active",
+        "progress": 68,
+        "tasks_total": 34,
+        "tasks_completed": 23
+      },
+      ...
+    ]
+  }
+  ```
+
+### Team Settings
+
+### Update Team Settings
+
+- **PUT** `/api/teams/{team_id}/settings`
+- **Description**: Update team settings
+- **Authentication**: Required (Team Owner only)
+- **Request Body**:
+  ```json
+  {
+    "default_member_role": "Member",
+    "allow_member_invites": true,
+    "require_join_approval": true,
+    "visibility": "public"
+  }
+  ```
+- **Response**: `200 OK`
+  ```json
+  {
+    "team_id": "uuid",
+    "default_member_role": "Member",
+    "allow_member_invites": true,
+    "require_join_approval": true,
+    "visibility": "public",
+    "updated_at": "timestamp"
+  }
+  ```
+
+### Get Team Settings
+
+- **GET** `/api/teams/{team_id}/settings`
+- **Description**: Get team settings
+- **Authentication**: Required (Team Owner or Co-Leader only)
+- **Response**: `200 OK`
+  ```json
+  {
+    "team_id": "uuid",
+    "default_member_role": "Member",
+    "allow_member_invites": true,
+    "require_join_approval": true,
+    "visibility": "public",
+    "created_at": "timestamp",
+    "updated_at": "timestamp"
+  }
+  ```
+
+### Team Join Requests
+
+### Request to Join Team
+
+- **POST** `/api/teams/{team_id}/join-requests`
+- **Description**: Request to join a team
+- **Authentication**: Required
+- **Request Body**:
+  ```json
+  {
+    "message": "I'd like to join your team because..."
+  }
+  ```
+- **Response**: `201 Created`
+  ```json
+  {
+    "id": "uuid",
+    "team_id": "uuid",
+    "user_id": "uuid",
+    "status": "pending",
+    "message": "I'd like to join your team because...",
+    "created_at": "timestamp"
+  }
+  ```
+
+### List Join Requests
+
+- **GET** `/api/teams/{team_id}/join-requests`
+- **Description**: Get pending join requests for a team
+- **Authentication**: Required (Team Owner or Co-Leader only)
+- **Response**: `200 OK`
+  ```json
+  {
+    "requests": [
+      {
+        "id": "uuid",
+        "user": {
+          "id": "uuid",
+          "full_name": "John Smith",
+          "profile_image_url": "url_to_image"
+        },
+        "message": "I'd like to join your team because...",
+        "created_at": "timestamp"
+      },
+      ...
+    ]
+  }
+  ```
+
+### Approve Join Request
+
+- **POST** `/api/teams/{team_id}/join-requests/{request_id}/approve`
+- **Description**: Approve a request to join the team
+- **Authentication**: Required (Team Owner or Co-Leader only)
+- **Request Body**:
+  ```json
+  {
+    "role": "Member"
+  }
+  ```
+- **Response**: `200 OK`
+  ```json
+  {
+    "team_id": "uuid",
+    "user_id": "uuid",
+    "role": "Member",
+    "joined_at": "timestamp"
+  }
+  ```
+
+### Reject Join Request
+
+- **POST** `/api/teams/{team_id}/join-requests/{request_id}/reject`
+- **Description**: Reject a request to join the team
+- **Authentication**: Required (Team Owner or Co-Leader only)
+- **Response**: `200 OK`
+  ```json
+  {
+    "message": "Join request rejected successfully"
+  }
+  ```
+
+### Cancel Join Request
+
+- **DELETE** `/api/teams/{team_id}/join-requests/{request_id}`
+- **Description**: Cancel a pending join request (by the requester)
+- **Authentication**: Required
+- **Response**: `204 No Content`
 
 ## Projects
 
@@ -1459,693 +1782,3 @@
     "category": "Development"
   }
   ```
-- **Response**: `200 OK`
-  ```json
-  {
-    "id": "uuid",
-    "title": "Updated Idea Title",
-    "description": "Updated description",
-    "category": "Development",
-    "updated_at": "timestamp"
-  }
-  ```
-
-### Vote on Idea
-
-- **POST** `/api/ideas/{idea_id}/vote`
-- **Description**: Vote on an idea
-- **Authentication**: Required
-- **Request Body**:
-  ```json
-  {
-    "vote_type": 1 // 1 for upvote, -1 for downvote
-  }
-  ```
-- **Response**: `200 OK`
-  ```json
-  {
-    "idea_id": "uuid",
-    "votes_count": 11,
-    "user_vote": 1
-  }
-  ```
-
-### Update Idea Status
-
-- **PUT** `/api/ideas/{idea_id}/status`
-- **Description**: Update idea status (admin only)
-- **Authentication**: Required
-- **Request Body**:
-  ```json
-  {
-    "status": "Approved"
-  }
-  ```
-- **Response**: `200 OK`
-  ```json
-  {
-    "id": "uuid",
-    "status": "Approved",
-    "updated_at": "timestamp"
-  }
-  ```
-
-### Delete Idea
-
-- **DELETE** `/api/ideas/{idea_id}`
-- **Description**: Delete an idea (owner or admin only)
-- **Authentication**: Required
-- **Response**: `204 No Content`
-
-## Comments
-
-### Add Comment
-
-- **POST** `/api/comments`
-- **Description**: Add a comment to an entity
-- **Authentication**: Required
-- **Request Body**:
-  ```json
-  {
-    "content": "This is a great idea!",
-    "entity_type": "Idea",
-    "entity_id": "idea_uuid",
-    "parent_comment_id": "comment_uuid" // Optional, for replies
-  }
-  ```
-- **Response**: `201 Created`
-  ```json
-  {
-    "id": "uuid",
-    "content": "This is a great idea!",
-    "user": {
-      "id": "uuid",
-      "full_name": "Jane Doe",
-      "profile_image_url": "url_to_image"
-    },
-    "entity_type": "Idea",
-    "entity_id": "idea_uuid",
-    "parent_comment_id": "comment_uuid",
-    "created_at": "timestamp"
-  }
-  ```
-
-### Get Comments
-
-- **GET** `/api/comments`
-- **Description**: Get comments for an entity
-- **Authentication**: Required
-- **Query Parameters**:
-  - `entity_type`: Type of entity (Task, Project, Idea, Challenge)
-  - `entity_id`: ID of the entity
-  - `parent_comment_id`: Optional, to get replies to a specific comment
-- **Response**: `200 OK`
-  ```json
-  {
-    "comments": [
-      {
-        "id": "uuid",
-        "content": "This is a great idea!",
-        "user": {
-          "id": "uuid",
-          "full_name": "Jane Doe",
-          "profile_image_url": "url_to_image"
-        },
-        "parent_comment_id": null,
-        "reply_count": 2,
-        "created_at": "timestamp"
-      },
-      ...
-    ]
-  }
-  ```
-
-### Update Comment
-
-- **PUT** `/api/comments/{comment_id}`
-- **Description**: Update a comment (owner only)
-- **Authentication**: Required
-- **Request Body**:
-  ```json
-  {
-    "content": "Updated comment content"
-  }
-  ```
-- **Response**: `200 OK`
-  ```json
-  {
-    "id": "uuid",
-    "content": "Updated comment content",
-    "updated_at": "timestamp"
-  }
-  ```
-
-### Delete Comment
-
-- **DELETE** `/api/comments/{comment_id}`
-- **Description**: Delete a comment (owner or admin only)
-- **Authentication**: Required
-- **Response**: `204 No Content`
-
-## Files
-
-### Upload File
-
-- **POST** `/api/files`
-- **Description**: Upload a file
-- **Authentication**: Required
-- **Request**: Multipart form data
-  - `file`: The file to upload
-  - `entity_type`: Type of entity (Project, Task, Team, User)
-  - `entity_id`: ID of the entity
-- **Response**: `201 Created`
-  ```json
-  {
-    "id": "uuid",
-    "name": "document.pdf",
-    "file_path": "/storage/files/uuid/document.pdf",
-    "file_type": "application/pdf",
-    "size_bytes": 1024000,
-    "entity_type": "Project",
-    "entity_id": "project_uuid",
-    "uploaded_by": "user_uuid",
-    "created_at": "timestamp"
-  }
-  ```
-
-### Get File
-
-- **GET** `/api/files/{file_id}`
-- **Description**: Get file details
-- **Authentication**: Required
-- **Response**: `200 OK`
-  ```json
-  {
-    "id": "uuid",
-    "name": "document.pdf",
-    "file_path": "/storage/files/uuid/document.pdf",
-    "file_type": "application/pdf",
-    "size_bytes": 1024000,
-    "entity_type": "Project",
-    "entity_id": "project_uuid",
-    "uploaded_by": {
-      "id": "uuid",
-      "full_name": "Jane Doe"
-    },
-    "created_at": "timestamp"
-  }
-  ```
-
-### Get Entity Files
-
-- **GET** `/api/files`
-- **Description**: Get files for an entity
-- **Authentication**: Required
-- **Query Parameters**:
-  - `entity_type`: Type of entity (Project, Task, Team, User)
-  - `entity_id`: ID of the entity
-- **Response**: `200 OK`
-  ```json
-  {
-    "files": [
-      {
-        "id": "uuid",
-        "name": "document.pdf",
-        "file_type": "application/pdf",
-        "size_bytes": 1024000,
-        "uploaded_by": {
-          "id": "uuid",
-          "full_name": "Jane Doe"
-        },
-        "created_at": "timestamp"
-      },
-      ...
-    ]
-  }
-  ```
-
-### Download File
-
-- **GET** `/api/files/{file_id}/download`
-- **Description**: Download a file
-- **Authentication**: Required
-- **Response**: File download
-
-### Delete File
-
-- **DELETE** `/api/files/{file_id}`
-- **Description**: Delete a file (uploader or admin only)
-- **Authentication**: Required
-- **Response**: `204 No Content`
-
-## Notifications
-
-### Get Notifications
-
-- **GET** `/api/notifications`
-- **Description**: Get user notifications
-- **Authentication**: Required
-- **Query Parameters**:
-  - `page`: Page number (default: 1)
-  - `limit`: Items per page (default: 20)
-  - `is_read`: Filter by read status (true/false)
-- **Response**: `200 OK`
-  ```json
-  {
-    "total": 28,
-    "unread_count": 7,
-    "page": 1,
-    "limit": 20,
-    "notifications": [
-      {
-        "id": "uuid",
-        "title": "Task Assigned",
-        "content": "You have been assigned to the task 'Implement user authentication'",
-        "type": "Task",
-        "reference_id": "task_uuid",
-        "is_read": false,
-        "created_at": "timestamp"
-      },
-      ...
-    ]
-  }
-  ```
-
-### Mark Notification as Read
-
-- **PUT** `/api/notifications/{notification_id}/read`
-- **Description**: Mark a notification as read
-- **Authentication**: Required
-- **Response**: `200 OK`
-  ```json
-  {
-    "id": "uuid",
-    "is_read": true,
-    "updated_at": "timestamp"
-  }
-  ```
-
-### Mark All Notifications as Read
-
-- **PUT** `/api/notifications/read-all`
-- **Description**: Mark all notifications as read
-- **Authentication**: Required
-- **Response**: `200 OK`
-  ```json
-  {
-    "message": "All notifications marked as read",
-    "count": 7
-  }
-  ```
-
-### Delete Notification
-
-- **DELETE** `/api/notifications/{notification_id}`
-- **Description**: Delete a notification
-- **Authentication**: Required
-- **Response**: `204 No Content`
-
-## Sprints
-
-### Create Sprint
-
-- **POST** `/api/projects/{project_id}/sprints`
-- **Description**: Create a new sprint
-- **Authentication**: Required (Team Owner or Co-Leader only)
-- **Request Body**:
-  ```json
-  {
-    "name": "Sprint 1",
-    "start_date": "2023-07-01",
-    "end_date": "2023-07-14",
-    "goal": "Complete user authentication module"
-  }
-  ```
-- **Response**: `201 Created`
-  ```json
-  {
-    "id": "uuid",
-    "project_id": "uuid",
-    "name": "Sprint 1",
-    "start_date": "2023-07-01",
-    "end_date": "2023-07-14",
-    "goal": "Complete user authentication module",
-    "status": "Planning",
-    "created_at": "timestamp"
-  }
-  ```
-
-### Get Sprint
-
-- **GET** `/api/sprints/{sprint_id}`
-- **Description**: Get sprint details
-- **Authentication**: Required
-- **Response**: `200 OK`
-  ```json
-  {
-    "id": "uuid",
-    "project_id": "uuid",
-    "name": "Sprint 1",
-    "start_date": "2023-07-01",
-    "end_date": "2023-07-14",
-    "goal": "Complete user authentication module",
-    "status": "Active",
-    "task_stats": {
-      "total": 15,
-      "completed": 5,
-      "in_progress": 3,
-      "to_do": 7
-    },
-    "created_at": "timestamp",
-    "updated_at": "timestamp"
-  }
-  ```
-
-### Update Sprint
-
-- **PUT** `/api/sprints/{sprint_id}`
-- **Description**: Update sprint details
-- **Authentication**: Required (Team Owner or Co-Leader only)
-- **Request Body**:
-  ```json
-  {
-    "name": "Sprint 1 - Authentication",
-    "end_date": "2023-07-15",
-    "status": "Active"
-  }
-  ```
-- **Response**: `200 OK`
-  ```json
-  {
-    "id": "uuid",
-    "name": "Sprint 1 - Authentication",
-    "end_date": "2023-07-15",
-    "status": "Active",
-    "updated_at": "timestamp"
-  }
-  ```
-
-### List Project Sprints
-
-- **GET** `/api/projects/{project_id}/sprints`
-- **Description**: Get a list of sprints for a project
-- **Authentication**: Required
-- **Response**: `200 OK`
-  ```json
-  {
-    "sprints": [
-      {
-        "id": "uuid",
-        "name": "Sprint 1 - Authentication",
-        "start_date": "2023-07-01",
-        "end_date": "2023-07-15",
-        "status": "Active",
-        "progress": 65
-      },
-      ...
-    ]
-  }
-  ```
-
-### Add Task to Sprint
-
-- **POST** `/api/sprints/{sprint_id}/tasks`
-- **Description**: Add a task to a sprint
-- **Authentication**: Required (Team Owner or Co-Leader only)
-- **Request Body**:
-  ```json
-  {
-    "task_id": "task_uuid"
-  }
-  ```
-- **Response**: `201 Created`
-  ```json
-  {
-    "sprint_id": "uuid",
-    "task_id": "task_uuid"
-  }
-  ```
-
-### Remove Task from Sprint
-
-- **DELETE** `/api/sprints/{sprint_id}/tasks/{task_id}`
-- **Description**: Remove a task from a sprint
-- **Authentication**: Required (Team Owner or Co-Leader only)
-- **Response**: `204 No Content`
-
-### Get Sprint Tasks
-
-- **GET** `/api/sprints/{sprint_id}/tasks`
-- **Description**: Get tasks assigned to a sprint
-- **Authentication**: Required
-- **Response**: `200 OK`
-  ```json
-  {
-    "tasks": [
-      {
-        "id": "uuid",
-        "title": "Implement user authentication",
-        "status": "In Progress",
-        "priority": "High",
-        "assigned_to": {
-          "id": "uuid",
-          "full_name": "Jane Doe"
-        }
-      },
-      ...
-    ]
-  }
-  ```
-
-### Delete Sprint
-
-- **DELETE** `/api/sprints/{sprint_id}`
-- **Description**: Delete a sprint
-- **Authentication**: Required (Team Owner or Co-Leader only)
-- **Response**: `204 No Content`
-
-## Milestones
-
-### Create Milestone
-
-- **POST** `/api/projects/{project_id}/milestones`
-- **Description**: Create a new milestone
-- **Authentication**: Required (Team Owner or Co-Leader only)
-- **Request Body**:
-  ```json
-  {
-    "title": "Beta Release",
-    "description": "First beta release with core functionality",
-    "due_date": "2023-08-15"
-  }
-  ```
-- **Response**: `201 Created`
-  ```json
-  {
-    "id": "uuid",
-    "project_id": "uuid",
-    "title": "Beta Release",
-    "description": "First beta release with core functionality",
-    "due_date": "2023-08-15",
-    "status": "Pending",
-    "created_at": "timestamp"
-  }
-  ```
-
-### Get Milestone
-
-- **GET** `/api/milestones/{milestone_id}`
-- **Description**: Get milestone details
-- **Authentication**: Required
-- **Response**: `200 OK`
-  ```json
-  {
-    "id": "uuid",
-    "project_id": "uuid",
-    "title": "Beta Release",
-    "description": "First beta release with core functionality",
-    "due_date": "2023-08-15",
-    "status": "In Progress",
-    "created_at": "timestamp",
-    "updated_at": "timestamp"
-  }
-  ```
-
-### Update Milestone
-
-- **PUT** `/api/milestones/{milestone_id}`
-- **Description**: Update milestone details
-- **Authentication**: Required (Team Owner or Co-Leader only)
-- **Request Body**:
-  ```json
-  {
-    "title": "Beta Release 1.0",
-    "status": "In Progress",
-    "due_date": "2023-08-20"
-  }
-  ```
-- **Response**: `200 OK`
-  ```json
-  {
-    "id": "uuid",
-    "title": "Beta Release 1.0",
-    "status": "In Progress",
-    "due_date": "2023-08-20",
-    "updated_at": "timestamp"
-  }
-  ```
-
-### List Project Milestones
-
-- **GET** `/api/projects/{project_id}/milestones`
-- **Description**: Get a list of milestones for a project
-- **Authentication**: Required
-- **Response**: `200 OK`
-  ```json
-  {
-    "milestones": [
-      {
-        "id": "uuid",
-        "title": "Beta Release 1.0",
-        "due_date": "2023-08-20",
-        "status": "In Progress"
-      },
-      {
-        "id": "uuid",
-        "title": "Production Release",
-        "due_date": "2023-10-01",
-        "status": "Pending"
-      },
-      ...
-    ]
-  }
-  ```
-
-### Delete Milestone
-
-- **DELETE** `/api/milestones/{milestone_id}`
-- **Description**: Delete a milestone
-- **Authentication**: Required (Team Owner or Co-Leader only)
-- **Response**: `204 No Content`
-
-## Activity Logs
-
-### Get User Activity
-
-- **GET** `/api/activity-logs/me`
-- **Description**: Get current user's activity logs
-- **Authentication**: Required
-- **Query Parameters**:
-  - `page`: Page number (default: 1)
-  - `limit`: Items per page (default: 20)
-  - `action_type`: Filter by action type
-- **Response**: `200 OK`
-  ```json
-  {
-    "total": 45,
-    "page": 1,
-    "limit": 20,
-    "activities": [
-      {
-        "id": "uuid",
-        "action_type": "Task_Completed",
-        "entity_type": "Task",
-        "entity_id": "task_uuid",
-        "description": "Completed task 'Implement user authentication'",
-        "created_at": "timestamp"
-      },
-      ...
-    ]
-  }
-  ```
-
-### Get Entity Activity
-
-- **GET** `/api/activity-logs`
-- **Description**: Get activity logs for an entity
-- **Authentication**: Required
-- **Query Parameters**:
-  - `entity_type`: Type of entity
-  - `entity_id`: ID of the entity
-  - `page`: Page number (default: 1)
-  - `limit`: Items per page (default: 20)
-- **Response**: `200 OK`
-  ```json
-  {
-    "total": 18,
-    "page": 1,
-    "limit": 20,
-    "activities": [
-      {
-        "id": "uuid",
-        "user": {
-          "id": "uuid",
-          "full_name": "Jane Doe"
-        },
-        "action_type": "Task_StatusChanged",
-        "description": "Changed task status from 'To Do' to 'In Progress'",
-        "created_at": "timestamp"
-      },
-      ...
-    ]
-  }
-  ```
-
-## Integrations
-
-### Connect Integration
-
-- **POST** `/api/integrations`
-- **Description**: Connect a third-party service
-- **Authentication**: Required
-- **Request Body**:
-  ```json
-  {
-    "service_name": "GitHub",
-    "access_token": "oauth_token",
-    "refresh_token": "refresh_token",
-    "token_expires_at": "expiry_timestamp"
-  }
-  ```
-- **Response**: `201 Created`
-  ```json
-  {
-    "id": "uuid",
-    "service_name": "GitHub",
-    "token_expires_at": "expiry_timestamp",
-    "created_at": "timestamp"
-  }
-  ```
-
-### List User Integrations
-
-- **GET** `/api/integrations`
-- **Description**: List all integrations for the current user
-- **Authentication**: Required
-- **Response**: `200 OK`
-  ```json
-  {
-    "integrations": [
-      {
-        "id": "uuid",
-        "service_name": "GitHub",
-        "token_expires_at": "expiry_timestamp",
-        "created_at": "timestamp"
-      },
-      {
-        "id": "uuid",
-        "service_name": "Jira",
-        "token_expires_at": "expiry_timestamp",
-        "created_at": "timestamp"
-      },
-      ...
-    ]
-  }
-  ```
-
-### Delete Integration
-
-- **DELETE** `/api/integrations/{integration_id}`
-- **Description**: Remove an integration
-- **Authentication**: Required
-- **Response**: `204 No Content`
